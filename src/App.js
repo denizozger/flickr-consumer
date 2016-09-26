@@ -1,21 +1,49 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Row, Col, Grid } from 'react-bootstrap';
+import $ from 'jquery'; 
+import FlickrImage from './components/FlickrImage';
 
 class App extends Component {
+
+  constructor() {
+    super();
+    this.state = { 
+      items: []
+    };
+  }
+
+  componentDidMount() {
+    this.serverRequest = $.getJSON(
+      this.props.source, { format: "json" }
+    )
+    .done(data => {
+      this.setState({
+        items: data.items
+      });
+    })
+    .fail(console.error);
+  }
+
+  componentWillUnmount() {
+    this.serverRequest.abort();
+  }
+
   render() {
     return (
-      <div className="App">
-        <div className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h2>Welcome to React</h2>
-        </div>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
-    );
+      <Grid>
+        <Row>
+          { 
+            this.state.items.map(item => 
+              <Col xs={6} md={4} key={item.link}>
+                <FlickrImage item={item} key={item.link}/>
+              </Col>
+            ) 
+          } 
+        </Row>
+      </Grid>
+      );
   }
+
 }
 
 export default App;
